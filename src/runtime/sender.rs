@@ -1,7 +1,7 @@
 use std::{
     future::Future,
     io::{self, Write},
-    net::TcpStream,
+    net::{TcpStream, Shutdown},
     pin::Pin,
     sync::{Arc, Mutex},
     task::{Context, Poll},
@@ -23,7 +23,11 @@ impl Future for TcpSender {
         };
         stream.set_nonblocking(true)?;
         match stream.write_all(&self.buffer) {
-            Ok(_) => Poll::Ready(Ok(())),
+            Ok(_) => {
+                // Shutdown the write side of the connection to signal we're done sending
+                let _ = stream.shutdown(Shutdown::Write);
+                Poll::Ready(Ok(()))
+            },
             Err(ref e) if e.kind() == io::ErrorKind::WouldBlock => {
                 cx.waker().wake_by_ref();
                 Poll::Pending

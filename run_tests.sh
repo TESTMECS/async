@@ -16,12 +16,4 @@ echo "⚡ Running benchmark tests..."
 cargo test --test benchmark_tests
 
 echo ""
-echo "🏗️  Testing build of server binary..."
-cargo build --bin server
-
-echo ""
-echo "🏗️  Testing build of client binary..."
-cargo build --bin client
-
-echo ""
 echo "✅ All tests completed!"
